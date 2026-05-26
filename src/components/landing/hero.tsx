@@ -4,7 +4,21 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Landmark, ArrowRight, Compass, TrendingUp, ShieldCheck, DollarSign } from "lucide-react";
 
-export default function Hero() {
+interface HeroProps {
+  stats?: {
+    unitsAvailable: number;
+    kawasanCount: number;
+    unitsSold: number;
+  };
+}
+
+export default function Hero({ stats }: HeroProps) {
+  const displayStats = stats || {
+    unitsAvailable: 120,
+    kawasanCount: 8,
+    unitsSold: 500,
+  };
+
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center bg-[#1A1A1A] overflow-hidden py-16 sm:py-24 px-4 sm:px-6 lg:px-8 border-b border-zinc-900">
       
@@ -80,6 +94,33 @@ export default function Hero() {
               <span>Consultation Call</span>
               <ArrowRight className="h-3.5 w-3.5 ml-2.5 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
+          </motion.div>
+
+          {/* Hero Statistics */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.5 }}
+            className="flex gap-8 sm:gap-12 pt-8 mt-8 border-t border-zinc-800/80"
+          >
+            <div className="space-y-1">
+              <div className="font-serif font-bold text-3xl sm:text-4xl text-[#C9A961] tracking-tight">
+                {displayStats.unitsAvailable}
+              </div>
+              <div className="text-[10px] text-zinc-500 font-medium tracking-widest uppercase">Unit Tersedia</div>
+            </div>
+            <div className="space-y-1">
+              <div className="font-serif font-bold text-3xl sm:text-4xl text-[#C9A961] tracking-tight">
+                {displayStats.kawasanCount}
+              </div>
+              <div className="text-[10px] text-zinc-500 font-medium tracking-widest uppercase">Kawasan</div>
+            </div>
+            <div className="space-y-1">
+              <div className="font-serif font-bold text-3xl sm:text-4xl text-[#C9A961] tracking-tight">
+                {displayStats.unitsSold}
+              </div>
+              <div className="text-[10px] text-zinc-500 font-medium tracking-widest uppercase">Unit Terjual</div>
+            </div>
           </motion.div>
         </div>
 

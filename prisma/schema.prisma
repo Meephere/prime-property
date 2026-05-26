@@ -33,18 +33,19 @@ enum SiapProperty {
 }
 
 model User {
-  id                    String      @id @default(uuid())
-  email                 String      @unique
+  id                    String             @id @default(uuid())
+  email                 String             @unique
   password              String
   nama                  String
-  role                  Role        @default(ADMIN)
-  status                UserStatus  @default(ACTIVE)
-  failed_login_attempts Int         @default(0)
+  role                  Role               @default(ADMIN)
+  status                UserStatus         @default(ACTIVE)
+  failed_login_attempts Int                @default(0)
   lockout_until         DateTime?
-  created_at            DateTime    @default(now())
-  updated_at            DateTime    @updatedAt
+  created_at            DateTime           @default(now())
+  updated_at            DateTime           @updatedAt
   properties            Property[]
   audit_logs            AuditLog[]
+  notification_reads    NotificationRead[]
 }
 
 model Property {
@@ -87,5 +88,24 @@ model ContactSubmission {
   pesan      String
   ip_address String
   created_at DateTime @default(now())
+}
+
+model Notification {
+  id          String             @id @default(uuid())
+  title       String
+  message     String
+  created_at  DateTime           @default(now())
+  reads       NotificationRead[]
+}
+
+model NotificationRead {
+  id             String       @id @default(uuid())
+  notificationId String
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  read_at        DateTime     @default(now())
+
+  @@unique([notificationId, userId])
 }
 

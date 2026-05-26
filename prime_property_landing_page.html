@@ -1,0 +1,317 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --black:#1A1A1A;--gold:#C9A961;--gold-light:#D9BC81;--red:#B33A3A;
+    --white:#FFFFFF;--gray:#F5F5F5;--gray2:#E8E8E8;--text-muted:#888;
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--black);}
+  .mock-browser{background:#2a2a2a;border-radius:10px;overflow:hidden;border:1px solid #444;}
+  .browser-bar{background:#3a3a3a;padding:10px 16px;display:flex;align-items:center;gap:10px;}
+  .browser-dots{display:flex;gap:6px;}
+  .dot{width:12px;height:12px;border-radius:50%;}
+  .dot-r{background:#ff5f57;}.dot-y{background:#febc2e;}.dot-g{background:#28c840;}
+  .url-bar{flex:1;background:#222;border-radius:4px;padding:4px 12px;font-size:11px;color:#aaa;font-family:monospace;}
+  .page{overflow-y:auto;max-height:600px;}
+  nav{background:var(--black);padding:0 5%;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .nav-logo{display:flex;align-items:center;gap:8px;}
+  .logo-mark{width:32px;height:32px;background:var(--gold);border-radius:2px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:14px;color:var(--black);}
+  .logo-text{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--white);letter-spacing:1px;}
+  .logo-sub{font-size:8px;color:var(--gold);letter-spacing:3px;font-weight:300;text-transform:uppercase;display:block;margin-top:-2px;}
+  .nav-links{display:flex;gap:28px;align-items:center;}
+  .nav-links a{color:#ccc;text-decoration:none;font-size:13px;font-weight:400;letter-spacing:0.5px;transition:color .2s;}
+  .nav-links a:hover{color:var(--gold);}
+  .btn-login{border:1px solid var(--gold);color:var(--gold);background:transparent;padding:7px 18px;border-radius:3px;font-size:12px;cursor:pointer;letter-spacing:0.5px;font-family:'DM Sans',sans-serif;transition:all .2s;}
+  .btn-login:hover{background:var(--gold);color:var(--black);}
+  .hero{background:var(--black);padding:70px 5% 60px;position:relative;overflow:hidden;}
+  .hero-bg{position:absolute;top:0;right:0;width:45%;height:100%;background:linear-gradient(135deg,transparent 40%,rgba(201,169,97,0.08) 100%);}
+  .hero-line{position:absolute;top:0;left:0;width:3px;height:100%;background:var(--gold);}
+  .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(201,169,97,0.15);border:1px solid rgba(201,169,97,0.3);color:var(--gold);font-size:11px;letter-spacing:2px;padding:5px 14px;border-radius:2px;margin-bottom:24px;text-transform:uppercase;}
+  .hero h1{font-family:'Playfair Display',serif;font-size:42px;font-weight:700;color:var(--white);line-height:1.15;max-width:520px;margin-bottom:16px;}
+  .hero h1 span{color:var(--gold);}
+  .hero p{font-size:14px;color:#999;max-width:400px;line-height:1.7;margin-bottom:32px;}
+  .hero-cta{display:flex;gap:12px;flex-wrap:wrap;}
+  .btn-primary{background:var(--gold);color:var(--black);border:none;padding:13px 28px;border-radius:3px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.5px;transition:all .2s;}
+  .btn-primary:hover{background:var(--gold-light);}
+  .btn-secondary{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,0.3);padding:13px 28px;border-radius:3px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
+  .btn-secondary:hover{border-color:var(--gold);color:var(--gold);}
+  .hero-stats{display:flex;gap:32px;margin-top:48px;padding-top:32px;border-top:1px solid rgba(255,255,255,0.08);}
+  .stat-item .num{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--gold);}
+  .stat-item .lbl{font-size:11px;color:#666;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+  .featured{padding:56px 5%;background:var(--white);}
+  .section-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;}
+  .section-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+  .section-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--black);}
+  .see-all{font-size:12px;color:var(--gold);text-decoration:none;letter-spacing:0.5px;border-bottom:1px solid var(--gold);padding-bottom:2px;}
+  .prop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .prop-card{background:var(--white);border:1px solid var(--gray2);border-radius:4px;overflow:hidden;transition:box-shadow .2s;}
+  .prop-card:hover{box-shadow:0 4px 20px rgba(0,0,0,0.1);}
+  .card-header{background:var(--black);padding:16px;position:relative;}
+  .card-tipe{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+  .card-name{font-family:'Playfair Display',serif;font-size:15px;color:var(--white);font-weight:700;}
+  .card-kawasan{font-size:11px;color:#888;margin-top:3px;}
+  .badge-status{position:absolute;top:12px;right:12px;font-size:9px;padding:3px 8px;border-radius:2px;letter-spacing:1px;text-transform:uppercase;font-weight:500;}
+  .badge-stock{background:rgba(40,180,99,0.15);color:#5cb87a;border:1px solid rgba(40,180,99,0.3);}
+  .badge-sold{background:rgba(179,58,58,0.15);color:var(--red);border:1px solid rgba(179,58,58,0.3);}
+  .card-body{padding:14px 16px;}
+  .card-specs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px;}
+  .spec-item{font-size:11px;color:var(--text-muted);}
+  .spec-item strong{display:block;font-size:13px;color:var(--black);font-weight:500;}
+  .card-price{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--black);border-top:1px solid var(--gray2);padding-top:10px;}
+  .card-price span{font-size:11px;color:var(--gold);font-family:'DM Sans',sans-serif;font-weight:400;margin-left:4px;}
+  .whyus{padding:56px 5%;background:var(--gray);}
+  .why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:32px;}
+  .why-card{background:var(--white);border:1px solid var(--gray2);border-radius:4px;padding:20px;}
+  .why-icon{width:36px;height:36px;border-radius:3px;background:rgba(201,169,97,0.12);display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px;}
+  .why-card h4{font-size:13px;font-weight:500;color:var(--black);margin-bottom:6px;}
+  .why-card p{font-size:11px;color:var(--text-muted);line-height:1.6;}
+  footer{background:var(--black);padding:32px 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  .footer-brand .logo-text{font-size:14px;}
+  .footer-contact{text-align:center;}
+  .footer-contact a{color:#888;font-size:12px;text-decoration:none;display:block;line-height:2;}
+  .footer-contact a:hover{color:var(--gold);}
+  .footer-links{display:flex;gap:20px;}
+  .footer-links a{color:#888;font-size:12px;text-decoration:none;}
+  .footer-links a:hover{color:var(--gold);}
+  .footer-copy{width:100%;text-align:center;font-size:10px;color:#444;padding-top:16px;border-top:1px solid #2a2a2a;margin-top:4px;letter-spacing:1px;}
+
+  @media(max-width:680px){
+    .mock-browser{border-radius:0;}
+    .nav-links{display:none;}
+    .hero h1{font-size:28px;}
+    .hero-stats{gap:20px;}
+    .prop-grid{grid-template-columns:1fr;}
+    .why-grid{grid-template-columns:1fr 1fr;}
+    .footer-contact,.footer-links{display:none;}
+    .section-header{flex-direction:column;align-items:flex-start;gap:8px;}
+  }
+
+  .mobile-toggle{display:none;background:none;border:1px solid rgba(201,169,97,0.4);color:var(--gold);padding:6px 10px;border-radius:3px;cursor:pointer;font-size:18px;}
+  @media(max-width:680px){.mobile-toggle{display:block;}}
+
+  .tag-siap{display:inline-block;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:2px;margin-top:4px;background:rgba(201,169,97,0.12);color:var(--gold);border:1px solid rgba(201,169,97,0.25);}
+</style>
+
+<div class="mock-browser">
+  <div class="browser-bar">
+    <div class="browser-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    <div class="url-bar">primeproperty.id</div>
+  </div>
+  <div class="page" id="mainPage">
+
+    <nav>
+      <div class="nav-logo">
+        <div class="logo-mark">PP</div>
+        <div>
+          <div class="logo-text">PRIME PROPERTY</div>
+          <span class="logo-sub">Real Estate Agency</span>
+        </div>
+      </div>
+      <div class="nav-links">
+        <a href="#">Beranda</a>
+        <a href="#">Tentang Kami</a>
+        <a href="#">Kontak</a>
+        <button class="btn-login">Login Agent</button>
+      </div>
+      <button class="mobile-toggle" aria-label="Menu">≡</button>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-line"></div>
+      <div class="hero-bg"></div>
+      <div class="hero-badge"><i class="ti ti-building-estate" aria-hidden="true"></i> Property Specialist Medan</div>
+      <h1>Temukan Properti <span>Impian Anda</span> Bersama Kami</h1>
+      <p>Prime Property menghadirkan pilihan ruko dan villa premium di kawasan strategis Medan dan sekitarnya.</p>
+      <div class="hero-cta">
+        <button class="btn-primary">Lihat Properti →</button>
+        <button class="btn-secondary">Hubungi Kami</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item"><div class="num">120+</div><div class="lbl">Unit Tersedia</div></div>
+        <div class="stat-item"><div class="num">8+</div><div class="lbl">Kawasan</div></div>
+        <div class="stat-item"><div class="num">500+</div><div class="lbl">Unit Terjual</div></div>
+      </div>
+    </section>
+
+    <section class="featured">
+      <div class="section-header">
+        <div>
+          <div class="section-tag">Pilihan Terbaik</div>
+          <div class="section-title">Properti Unggulan</div>
+        </div>
+        <a href="#" class="see-all">Lihat Semua</a>
+      </div>
+      <div class="prop-grid">
+
+        <div class="prop-card">
+          <div class="card-header">
+            <div class="card-tipe">Ruko</div>
+            <div class="card-name">Aston Villas</div>
+            <div class="card-kawasan"><i class="ti ti-map-pin" aria-hidden="true" style="font-size:10px;"></i> Krakatau, Medan</div>
+            <span class="badge-status badge-stock">In Stock</span>
+          </div>
+          <div class="card-body">
+            <div class="card-specs">
+              <div class="spec-item"><strong>6 × 21.5 m</strong>Lebar × Panjang</div>
+              <div class="spec-item"><strong>3 Lantai</strong>Tingkat</div>
+              <div class="spec-item"><strong>Utara</strong>Hadap</div>
+              <div class="spec-item"><strong>✓ Carport</strong>Fasilitas</div>
+            </div>
+            <span class="tag-siap">Siap Huni</span>
+            <div class="card-price">Rp 1.350.000.000 <span>Nego</span></div>
+          </div>
+        </div>
+
+        <div class="prop-card">
+          <div class="card-header">
+            <div class="card-tipe">Villa</div>
+            <div class="card-name">Banyan Tree Blok A</div>
+            <div class="card-kawasan"><i class="ti ti-map-pin" aria-hidden="true" style="font-size:10px;"></i> Pancing, Medan</div>
+            <span class="badge-status badge-stock">In Stock</span>
+          </div>
+          <div class="card-body">
+            <div class="card-specs">
+              <div class="spec-item"><strong>8 × 17.8 m</strong>Lebar × Panjang</div>
+              <div class="spec-item"><strong>2.5 Lantai</strong>Tingkat</div>
+              <div class="spec-item"><strong>Selatan</strong>Hadap</div>
+              <div class="spec-item"><strong>✓ Carport</strong>Fasilitas</div>
+            </div>
+            <span class="tag-siap">Siap Kosong</span>
+            <div class="card-price">Rp 2.100.000.000</div>
+          </div>
+        </div>
+
+        <div class="prop-card">
+          <div class="card-header" style="background:#2a2a2a;">
+            <div class="card-tipe">Ruko</div>
+            <div class="card-name">Permai 123</div>
+            <div class="card-kawasan"><i class="ti ti-map-pin" aria-hidden="true" style="font-size:10px;"></i> Cemara Asri, Medan</div>
+            <span class="badge-status badge-sold">Sold Out</span>
+          </div>
+          <div class="card-body" style="opacity:.7;">
+            <div class="card-specs">
+              <div class="spec-item"><strong>4.5 × 21 m</strong>Lebar × Panjang</div>
+              <div class="spec-item"><strong>2 Lantai</strong>Tingkat</div>
+              <div class="spec-item"><strong>Timur</strong>Hadap</div>
+              <div class="spec-item"><strong>— Carport</strong>Fasilitas</div>
+            </div>
+            <span class="tag-siap" style="background:rgba(179,58,58,0.1);color:#B33A3A;border-color:rgba(179,58,58,0.25);">Terjual</span>
+            <div class="card-price">Rp 890.000.000</div>
+          </div>
+        </div>
+
+        <div class="prop-card">
+          <div class="card-header">
+            <div class="card-tipe">Villa</div>
+            <div class="card-name">Project Ville</div>
+            <div class="card-kawasan"><i class="ti ti-map-pin" aria-hidden="true" style="font-size:10px;"></i> Helvetia, Medan</div>
+            <span class="badge-status badge-stock">In Stock</span>
+          </div>
+          <div class="card-body">
+            <div class="card-specs">
+              <div class="spec-item"><strong>10 × 20 m</strong>Lebar × Panjang</div>
+              <div class="spec-item"><strong>3.5 Lantai</strong>Tingkat</div>
+              <div class="spec-item"><strong>Barat</strong>Hadap</div>
+              <div class="spec-item"><strong>✓ Carport</strong>Fasilitas</div>
+            </div>
+            <span class="tag-siap">Siap Huni</span>
+            <div class="card-price">Rp 3.200.000.000 <span>Nego</span></div>
+          </div>
+        </div>
+
+        <div class="prop-card">
+          <div class="card-header">
+            <div class="card-tipe">Ruko</div>
+            <div class="card-name">Mentari Square</div>
+            <div class="card-kawasan"><i class="ti ti-map-pin" aria-hidden="true" style="font-size:10px;"></i> Tembung, Medan</div>
+            <span class="badge-status badge-stock">In Stock</span>
+          </div>
+          <div class="card-body">
+            <div class="card-specs">
+              <div class="spec-item"><strong>5 × 18 m</strong>Lebar × Panjang</div>
+              <div class="spec-item"><strong>2 Lantai</strong>Tingkat</div>
+              <div class="spec-item"><strong>Utara</strong>Hadap</div>
+              <div class="spec-item"><strong>✓ Carport</strong>Fasilitas</div>
+            </div>
+            <span class="tag-siap" style="background:rgba(140,100,200,0.1);color:#8a56c8;border-color:rgba(140,100,200,0.25);">Siap Huni Renovasi</span>
+            <div class="card-price">Rp 1.050.000.000</div>
+          </div>
+        </div>
+
+        <div class="prop-card">
+          <div class="card-header">
+            <div class="card-tipe">Villa</div>
+            <div class="card-name">Kuala Residence</div>
+            <div class="card-kawasan"><i class="ti ti-map-pin" aria-hidden="true" style="font-size:10px;"></i> Kuala, Medan</div>
+            <span class="badge-status badge-stock">In Stock</span>
+          </div>
+          <div class="card-body">
+            <div class="card-specs">
+              <div class="spec-item"><strong>7 × 22 m</strong>Lebar × Panjang</div>
+              <div class="spec-item"><strong>3 Lantai</strong>Tingkat</div>
+              <div class="spec-item"><strong>Timur</strong>Hadap</div>
+              <div class="spec-item"><strong>✓ Carport</strong>Fasilitas</div>
+            </div>
+            <span class="tag-siap">Siap Huni</span>
+            <div class="card-price">Rp 2.750.000.000</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="whyus">
+      <div style="text-align:center;margin-bottom:8px;">
+        <div class="section-tag" style="display:inline-block;">Kenapa Kami</div>
+      </div>
+      <div class="section-title" style="text-align:center;">Mengapa Prime Property?</div>
+      <div class="why-grid">
+        <div class="why-card">
+          <div class="why-icon"><i class="ti ti-certificate" aria-hidden="true" style="color:#C9A961;font-size:20px;"></i></div>
+          <h4>Properti Terverifikasi</h4>
+          <p>Setiap listing telah diverifikasi legalitas dan kondisi fisiknya oleh tim kami.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon"><i class="ti ti-map-2" aria-hidden="true" style="color:#C9A961;font-size:20px;"></i></div>
+          <h4>Lokasi Strategis</h4>
+          <p>Kawasan pilihan di Medan dengan akses transportasi dan fasilitas lengkap.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon"><i class="ti ti-headset" aria-hidden="true" style="color:#C9A961;font-size:20px;"></i></div>
+          <h4>Agen Berpengalaman</h4>
+          <p>Tim agen profesional siap membantu dari pencarian hingga serah terima kunci.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon"><i class="ti ti-shield-check" aria-hidden="true" style="color:#C9A961;font-size:20px;"></i></div>
+          <h4>Transaksi Aman</h4>
+          <p>Proses jual beli transparan dengan dokumen legal yang terurus dengan baik.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-brand">
+        <div class="nav-logo">
+          <div class="logo-mark">PP</div>
+          <div>
+            <div class="logo-text">PRIME PROPERTY</div>
+            <span class="logo-sub">Real Estate Agency</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer-contact">
+        <a href="#">📞 +62 812-3456-7890</a>
+        <a href="#">✉ info@primeproperty.id</a>
+        <a href="#">💬 WhatsApp</a>
+      </div>
+      <div class="footer-links">
+        <a href="#">Tentang Kami</a>
+        <a href="#">Kontak</a>
+        <a href="#">Kebijakan Privasi</a>
+      </div>
+      <div class="footer-copy">© 2026 Prime Property · All Rights Reserved</div>
+    </footer>
+
+  </div>
+</div>

@@ -50,6 +50,22 @@ export async function GET(
       return NextResponse.json({ error: "Tidak ditemukan", message: "Properti tidak ditemukan atau telah dihapus." }, { status: 404 });
     }
 
+    // Log the view action in the audit trail
+    try {
+      await db.auditLog.create({
+        data: {
+          userId: user.id,
+          action: "VIEW_PROPERTY",
+          details: {
+            propertyId: id,
+            nama_property: property.nama_property,
+          },
+        },
+      });
+    } catch (logError) {
+      console.warn("Gagal menulis audit log VIEW_PROPERTY:", logError);
+    }
+
     const serializedProperty = {
       ...property,
       lebar: Number(property.lebar),
@@ -183,6 +199,16 @@ export async function PUT(
                 nama_property: prop.nama_property,
                 changes,
               },
+            },
+          });
+        }
+
+        // Trigger notification if status changed from in_stock to sold_out
+        if (oldProperty && oldProperty.status === "in_stock" && data.status === "sold_out") {
+          await tx.notification.create({
+            data: {
+              title: "Properti Terjual (Sold Out)",
+              message: `Status properti "${prop.nama_property}" (${prop.tipe}) di kawasan ${prop.kawasan.join(", ")} telah diubah oleh Superadmin menjadi SOLD OUT.`,
             },
           });
         }

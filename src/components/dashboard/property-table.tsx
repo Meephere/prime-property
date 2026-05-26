@@ -16,9 +16,20 @@ interface TableProps {
   };
   onRowClick: (property: Property) => void;
   highlightedId?: string | null;
+  selectedCompareIds?: string[];
+  onCompareToggle?: (id: string) => void;
+  onSelectAllToggle?: (checked: boolean) => void;
 }
 
-export default function PropertyTable({ properties, pagination, onRowClick, highlightedId }: TableProps) {
+export default function PropertyTable({
+  properties,
+  pagination,
+  onRowClick,
+  highlightedId,
+  selectedCompareIds = [],
+  onCompareToggle,
+  onSelectAllToggle,
+}: TableProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -96,6 +107,14 @@ export default function PropertyTable({ properties, pagination, onRowClick, high
         <table className="w-full min-w-[1200px] text-left border-collapse">
           <thead>
             <tr className="border-b border-zinc-900 bg-[#1F1F1F] text-[10px] uppercase font-bold text-zinc-400 tracking-wider select-none">
+              <th className="px-4 py-4 text-center w-12">
+                <input
+                  type="checkbox"
+                  checked={properties.length > 0 && properties.every((p) => selectedCompareIds.includes(p.id))}
+                  onChange={(e) => onSelectAllToggle?.(e.target.checked)}
+                  className="h-3.5 w-3.5 bg-[#111111] border border-zinc-800 rounded-none checked:bg-[#C9A961] checked:border-[#C9A961] focus:ring-0 focus:outline-none cursor-pointer accent-[#C9A961]"
+                />
+              </th>
               <th onClick={() => handleSort("nama")} className="px-6 py-4 cursor-pointer hover:bg-[#252525] hover:text-white transition-colors">
                 Nama {getSortIcon("nama")}
               </th>
@@ -118,7 +137,7 @@ export default function PropertyTable({ properties, pagination, onRowClick, high
           <tbody className="divide-y divide-zinc-900 text-xs">
             {properties.length === 0 ? (
               <tr>
-                <td colSpan={11} className="px-6 py-12 text-center text-zinc-500 bg-[#161616]">
+                <td colSpan={12} className="px-6 py-12 text-center text-zinc-500 bg-[#161616]">
                   Tidak ada properti yang cocok dengan filter aktif.
                 </td>
               </tr>
@@ -135,6 +154,14 @@ export default function PropertyTable({ properties, pagination, onRowClick, high
                         : "border-l-transparent hover:border-l-zinc-700"
                     }`}
                   >
+                    <td className="px-4 py-4 text-center" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={selectedCompareIds.includes(property.id)}
+                        onChange={() => onCompareToggle?.(property.id)}
+                        className="h-3.5 w-3.5 bg-[#111111] border border-zinc-800 rounded-none checked:bg-[#C9A961] checked:border-[#C9A961] focus:ring-0 focus:outline-none cursor-pointer accent-[#C9A961]"
+                      />
+                    </td>
                     <td className="px-6 py-4 font-bold text-white max-w-[200px] truncate">
                       {property.nama_property}
                     </td>

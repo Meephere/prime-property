@@ -85,16 +85,11 @@ export default function WhyChooseUs() {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12"
         >
           {features.map((feature, idx) => {
-            // Apply slight vertical offset to odd index items on desktop for asymmetry
-            const isOffset = idx % 2 === 1;
-
             return (
               <motion.div
                 key={idx}
                 variants={itemVariants}
-                className={`bg-white border border-zinc-200 p-8 sm:p-10 flex flex-col justify-between hover:border-[#C9A961]/40 transition-all duration-500 rounded-none group h-full glow-gold-hover ${
-                  isOffset ? "lg:translate-y-6" : ""
-                }`}
+                className="bg-white border border-zinc-200 p-8 sm:p-10 flex flex-col justify-between hover:border-[#C9A961]/40 transition-all duration-500 rounded-none group h-full glow-gold-hover"
               >
                 <div className="space-y-6">
                   {/* Icon Block with Thin Accent Border */}

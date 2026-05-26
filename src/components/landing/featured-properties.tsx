@@ -2,8 +2,11 @@
 
 import { motion } from "framer-motion";
 import { formatRupiah, formatDimensions } from "@/lib/utils";
-import { Compass, Eye, Landmark, Layers, Sparkles } from "lucide-react";
+import { Compass, Eye, Landmark, Layers, Sparkles, MapPin } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import PublicPropertyDetailDrawer from "./public-property-detail-drawer";
 
 interface PropertyItem {
   id: string;
@@ -23,6 +26,40 @@ interface PropertyItem {
 }
 
 export default function FeaturedProperties({ properties }: { properties: PropertyItem[] }) {
+  const searchParams = useSearchParams();
+  const [selectedProperty, setSelectedProperty] = useState<PropertyItem | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const propertiParam = searchParams.get("properti");
+
+  useEffect(() => {
+    if (propertiParam) {
+      const found = properties.find((p) => p.id === propertiParam);
+      if (found) {
+        setSelectedProperty(found);
+        setDrawerOpen(true);
+      }
+    }
+  }, [propertiParam, properties]);
+
+  const handleCloseDrawer = () => {
+    setDrawerOpen(false);
+    // Remove query param from URL without page reload
+    const params = new URLSearchParams(window.location.search);
+    params.delete("properti");
+    const newRelativePathQuery = window.location.pathname + (params.toString() ? `?${params.toString()}` : "");
+    window.history.replaceState(null, "", newRelativePathQuery);
+  };
+
+  const handleViewDetails = (property: PropertyItem) => {
+    setSelectedProperty(property);
+    setDrawerOpen(true);
+    // Sync with URL query param
+    const params = new URLSearchParams(window.location.search);
+    params.set("properti", property.id);
+    const newRelativePathQuery = window.location.pathname + `?${params.toString()}`;
+    window.history.replaceState(null, "", newRelativePathQuery);
+  };
   const getSiapLabel = (siap: string) => {
     switch (siap) {
       case "siap_huni":
@@ -96,96 +133,94 @@ export default function FeaturedProperties({ properties }: { properties: Propert
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
           >
             {properties.slice(0, 6).map((property, index) => {
-              // Create an asymmetrical layout feel by giving some cards different vertical shifts on desktop
-              const isStaggered = index % 3 === 1; // Middle column shifted slightly down on desktop
-              
               return (
                 <motion.div
                   key={property.id}
                   variants={cardVariants}
-                  className={`bg-[#F5F5F5] border border-zinc-200 hover:border-[#C9A961]/40 transition-all duration-500 flex flex-col group relative overflow-hidden rounded-none h-full glow-gold-hover ${
-                    isStaggered ? "lg:translate-y-8" : ""
-                  }`}
+                  onClick={() => handleViewDetails(property)}
+                  className="bg-white border border-zinc-200 hover:border-[#C9A961]/40 transition-all duration-500 flex flex-col group relative overflow-hidden rounded-none h-full glow-gold-hover cursor-pointer"
                 >
                   {/* Subtle top indicator line on hover */}
-                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#C9A961] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#C9A961] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left z-20"></div>
                   
-                  {/* Card Content Wrapper */}
-                  <div className="p-7 flex-grow flex flex-col justify-between space-y-6">
+                  {/* Black Card Header */}
+                  <div className="bg-[#1A1A1A] p-6 relative border-b border-zinc-800/50 flex flex-col justify-between h-[130px]">
+                    <span className="text-[10px] tracking-[0.2em] uppercase font-bold text-[#C9A961]">
+                      {property.tipe}
+                    </span>
                     
-                    {/* Header: Category & Badges */}
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] tracking-[0.2em] uppercase font-bold text-[#C9A961]">
-                        {property.tipe}
+                    <h3 className="text-base font-bold text-white font-serif tracking-wide mt-1.5 pr-14 line-clamp-1 group-hover:text-[#C9A961] transition-colors duration-300">
+                      {property.nama_property}
+                    </h3>
+                    
+                    <div className="text-[11px] text-zinc-400 mt-2 flex items-center gap-1 font-medium">
+                      <MapPin className="h-3.5 w-3.5 text-[#C9A961] shrink-0" />
+                      <span>{property.kawasan.join(", ")}</span>
+                    </div>
+
+                    <div className="absolute top-6 right-6">
+                      <span
+                        className={`px-2 py-0.5 text-[9px] tracking-wider uppercase font-bold border transition-all ${
+                          property.status === "in_stock"
+                            ? "bg-green-950/30 border-green-800/50 text-green-400 shadow-[0_0_8px_rgba(34,197,94,0.08)]"
+                            : "bg-red-950/30 border-red-800/50 text-[#FF6B6B] shadow-[0_0_8px_rgba(179,58,58,0.08)]"
+                        }`}
+                      >
+                        {property.status === "in_stock" ? "In Stock" : "Sold Out"}
                       </span>
-                      <div className="flex space-x-1.5">
-                        <span
-                          className={`px-2 py-0.5 text-[9px] tracking-wider uppercase font-bold border transition-all ${
-                            property.status === "in_stock"
-                              ? "bg-green-50 border-green-200 text-green-700 shadow-[0_0_8px_rgba(34,197,94,0.08)]"
-                              : "bg-red-50 border-red-200 text-[#B33A3A] shadow-[0_0_8px_rgba(179,58,58,0.08)]"
-                          }`}
-                        >
-                          {property.status === "in_stock" ? "In Stock" : "Sold Out"}
-                        </span>
-                        <span className="px-2 py-0.5 text-[9px] tracking-wider uppercase font-bold border bg-[#C9A961]/5 border-[#C9A961]/35 text-[#C9A961]">
-                          {getSiapLabel(property.siap)}
-                        </span>
-                      </div>
                     </div>
-
-                    {/* Title */}
-                    <div className="space-y-1">
-                      <h3 className="text-lg font-bold text-[#1A1A1A] group-hover:text-[#C9A961] transition-colors duration-300 line-clamp-1">
-                        {property.nama_property}
-                      </h3>
-                      <p className="text-[10px] uppercase tracking-wider text-zinc-500 flex items-center font-medium">
-                        <Layers className="h-3 w-3 mr-1 text-zinc-400" />
-                        <span>{property.group || "Non-Group"}</span>
-                      </p>
-                    </div>
-
-                    {/* Pricing with investment layout */}
-                    <div className="border-t border-zinc-200/60 pt-4 space-y-0.5 text-left">
-                      <p className="text-[9px] text-zinc-400 uppercase tracking-widest font-medium">Investment Value</p>
-                      <p className="text-xl font-bold text-[#1A1A1A] tracking-tight group-hover:text-[#C9A961] transition-colors">
-                        {formatRupiah(property.price)}
-                      </p>
-                    </div>
-
+                  </div>
+                  
+                  {/* Light Card Body */}
+                  <div className="p-6 flex-grow flex flex-col justify-between space-y-5">
                     {/* Grid details (Architectural data look) */}
-                    <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-[11px] border-t border-zinc-200/60 pt-4 text-zinc-650">
+                    <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-[11px] text-zinc-600">
                       <div className="space-y-0.5">
-                        <p className="text-zinc-450 text-[9px] uppercase tracking-wider font-light">Dimensions</p>
+                        <p className="text-zinc-400 text-[9px] uppercase tracking-wider font-light">Dimensions</p>
                         <p className="font-semibold text-zinc-800">
                           {formatDimensions(property.lebar, property.panjang)}
                         </p>
                       </div>
                       <div className="space-y-0.5">
-                        <p className="text-zinc-450 text-[9px] uppercase tracking-wider font-light">Facing</p>
-                        <p className="font-semibold text-zinc-800 line-clamp-1">
-                          {property.hadap.join(", ")}
-                        </p>
-                      </div>
-                      <div className="space-y-0.5">
-                        <p className="text-zinc-450 text-[9px] uppercase tracking-wider font-light">Floors</p>
+                        <p className="text-zinc-400 text-[9px] uppercase tracking-wider font-light">Floors</p>
                         <p className="font-semibold text-zinc-800">
                           {property.tingkat} Lantai
                         </p>
                       </div>
                       <div className="space-y-0.5">
-                        <p className="text-zinc-450 text-[9px] uppercase tracking-wider font-light">Sector</p>
-                        <p className="font-semibold text-zinc-800 line-clamp-1">
-                          {property.kawasan.join(", ")}
+                        <p className="text-zinc-450 text-[9px] uppercase tracking-wider font-light">Facing</p>
+                        <p className="font-semibold text-zinc-850 line-clamp-1">
+                          {property.hadap.join(", ")}
                         </p>
                       </div>
+                      <div className="space-y-0.5">
+                        <p className="text-zinc-450 text-[9px] uppercase tracking-wider font-light">Group</p>
+                        <p className="font-semibold text-zinc-850 line-clamp-1">
+                          {property.group || "Non-Group"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Ready status tag */}
+                    <div>
+                      <span className="inline-block px-2.5 py-0.5 text-[9px] tracking-wider uppercase font-bold bg-[#C9A961]/10 border border-[#C9A961]/25 text-[#C9A961] rounded-sm">
+                        {getSiapLabel(property.siap)}
+                      </span>
+                    </div>
+
+                    {/* Pricing with investment layout */}
+                    <div className="border-t border-zinc-200/80 pt-4 space-y-0.5 text-left">
+                      <p className="text-[9px] text-zinc-400 uppercase tracking-widest font-medium">Investment Value</p>
+                      <p className="text-lg font-bold text-[#1A1A1A] tracking-tight group-hover:text-[#C9A961] transition-colors">
+                        {formatRupiah(property.price)}
+                      </p>
                     </div>
                   </div>
 
                   {/* Card Footer: Detail Link with Gold Underline */}
-                  <div className="px-7 py-4 bg-zinc-100 border-t border-zinc-200/60 flex items-center justify-between text-xs text-zinc-600 transition-colors group-hover:bg-[#C9A961]/5 duration-300">
-                    <span className="flex items-center text-[10px] tracking-wider uppercase font-semibold">
-                      <Compass className="h-3.5 w-3.5 mr-1.5 text-[#C9A961]" />
+                  <div className="px-6 py-3.5 bg-zinc-50 border-t border-zinc-100 flex items-center justify-between text-xs text-zinc-650 transition-colors group-hover:bg-[#C9A961]/5 duration-300">
+                    <span className="flex items-center text-[10px] tracking-wider uppercase font-semibold text-zinc-600">
+                      <MapPin className="h-3.5 w-3.5 mr-1.5 text-[#C9A961]" />
                       <span>{property.kawasan[0]}</span>
                     </span>
                     <span className="inline-flex items-center text-[#C9A961] font-bold text-[10px] tracking-widest uppercase transition-transform group-hover:translate-x-1 duration-300">
@@ -199,6 +234,12 @@ export default function FeaturedProperties({ properties }: { properties: Propert
           </motion.div>
         )}
       </div>
+
+      <PublicPropertyDetailDrawer
+        property={selectedProperty}
+        isOpen={drawerOpen}
+        onClose={handleCloseDrawer}
+      />
     </section>
   );
 }
