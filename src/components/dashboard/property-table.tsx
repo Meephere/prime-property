@@ -55,24 +55,24 @@ export default function PropertyTable({ properties, pagination, onRowClick, high
     switch (siap) {
       case "siap_huni":
         return (
-          <span className="px-2.5 py-0.5 text-[9px] tracking-wider uppercase font-bold border border-[#C9A961]/40 bg-[#C9A961]/10 text-[#C9A961] shadow-[0_0_8px_rgba(201,169,97,0.12)] rounded-none">
+          <span className="px-2.5 py-0.5 text-[9px] tracking-wider uppercase font-bold border border-[#C9A961]/40 bg-[#C9A961]/10 text-[#C9A961] shadow-[0_0_8px_rgba(201,169,97,0.12)] rounded-none whitespace-nowrap">
             Siap Huni
           </span>
         );
       case "siap_kosong":
         return (
-          <span className="px-2.5 py-0.5 text-[9px] tracking-wider uppercase font-bold border border-purple-800 bg-purple-950/45 text-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.12)] rounded-none">
+          <span className="px-2.5 py-0.5 text-[9px] tracking-wider uppercase font-bold border border-purple-800 bg-purple-950/45 text-purple-400 shadow-[0_0_8px_rgba(168,85,247,0.12)] rounded-none whitespace-nowrap">
             Siap Kosong
           </span>
         );
       case "siap_huni_renovasi":
         return (
-          <span className="px-2.5 py-0.5 text-[9px] tracking-wider uppercase font-bold border border-amber-800 bg-amber-950/45 text-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.12)] rounded-none">
+          <span className="px-2.5 py-0.5 text-[9px] tracking-wider uppercase font-bold border border-amber-800 bg-amber-950/45 text-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.12)] rounded-none whitespace-nowrap">
             Siap Huni Renovasi
           </span>
         );
       default:
-        return <span className="text-[10px] uppercase font-semibold text-zinc-400">{siap}</span>;
+        return <span className="text-[10px] uppercase font-semibold text-zinc-400 whitespace-nowrap">{siap}</span>;
     }
   };
 
@@ -163,9 +163,9 @@ export default function PropertyTable({ properties, pagination, onRowClick, high
                         )}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`inline-flex px-2.5 py-0.5 text-[9px] tracking-wider uppercase font-bold border rounded-none ${
+                        className={`inline-flex px-2.5 py-0.5 text-[9px] tracking-wider uppercase font-bold border rounded-none whitespace-nowrap ${
                           property.status === "in_stock"
                             ? "bg-green-950/40 border-green-800 text-green-400 shadow-[0_0_10px_rgba(34,197,94,0.15)]"
                             : "bg-red-950/40 border-red-900/60 text-[#B33A3A] shadow-[0_0_10px_rgba(179,58,58,0.15)]"
@@ -174,7 +174,7 @@ export default function PropertyTable({ properties, pagination, onRowClick, high
                         {property.status === "in_stock" ? "In Stock" : "Sold Out"}
                       </span>
                     </td>
-                    <td className="px-6 py-4">{getSiapBadge(property.siap)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{getSiapBadge(property.siap)}</td>
                     <td className="px-6 py-4 text-zinc-400 truncate max-w-[120px]">
                       {property.kawasan.join(", ")}
                     </td>
