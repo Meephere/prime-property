@@ -5,6 +5,7 @@ import { useForm, useFormState } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { X, Loader2, AlertCircle, Save, PlusCircle, Check } from "lucide-react";
+import { createPortal } from "react-dom";
 
 import { Property } from "@/types/property";
 
@@ -45,10 +46,15 @@ export default function PropertyFormModal({ property, isOpen, onClose, onSuccess
   const isEdit = !!property;
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
   
   // Custom tag states for kawasan
   const [customKawasan, setCustomKawasan] = useState("");
   const [availableKawasan, setAvailableKawasan] = useState(KAWASAN_OPTIONS);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const {
     register,
@@ -214,13 +220,13 @@ export default function PropertyFormModal({ property, isOpen, onClose, onSuccess
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  const modalContent = (
+    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/70 backdrop-blur-sm animate-fade-in" onClick={onClose}></div>
 
       {/* Modal Container */}
-      <div className="relative bg-[#161616] border border-zinc-900 w-full max-w-2xl max-h-[90vh] flex flex-col justify-between shadow-2xl z-10 text-zinc-300 overflow-hidden rounded-none">
+      <div className="relative bg-[#161616] border border-zinc-900 w-full max-w-2xl max-h-[90vh] flex flex-col justify-between shadow-2xl z-[1000] text-zinc-300 overflow-hidden rounded-none">
         
         {/* Header */}
         <div className="p-6 border-b border-zinc-900 flex items-center justify-between bg-[#1F1F1F]">
@@ -593,4 +599,6 @@ export default function PropertyFormModal({ property, isOpen, onClose, onSuccess
       </div>
     </div>
   );
+
+  return mounted ? createPortal(modalContent, document.body) : null;
 }

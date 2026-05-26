@@ -3,6 +3,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { formatRupiah, formatDimensions } from "@/lib/utils";
 import { X, Edit3, Trash2, MapPin, Compass, ShieldAlert, Layers } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { Property } from "@/types/property";
 
@@ -23,6 +25,12 @@ export default function PropertyDetailDrawer({
   onEdit,
   onDelete,
 }: DrawerProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   if (!property) return null;
 
   const isSuperadmin = userRole === "SUPERADMIN";
@@ -40,7 +48,7 @@ export default function PropertyDetailDrawer({
     }
   };
 
-  return (
+  const drawerContent = (
     <AnimatePresence>
       {isOpen && (
         <>
@@ -50,7 +58,7 @@ export default function PropertyDetailDrawer({
             animate={{ opacity: 0.6 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/60 z-[999] backdrop-blur-sm"
           ></motion.div>
 
           {/* Sliding Side Panel Drawer */}
@@ -59,7 +67,7 @@ export default function PropertyDetailDrawer({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 bottom-0 w-full sm:w-md bg-[#161616] border-l border-zinc-900 z-50 overflow-y-auto flex flex-col justify-between"
+            className="fixed right-0 top-0 bottom-0 w-full sm:w-md bg-[#161616] border-l border-zinc-900 z-[1000] overflow-y-auto flex flex-col justify-between"
           >
             {/* Header */}
             <div className="p-6 border-b border-zinc-900 flex items-center justify-between bg-[#1F1F1F]">
@@ -207,4 +215,6 @@ export default function PropertyDetailDrawer({
       )}
     </AnimatePresence>
   );
+
+  return mounted ? createPortal(drawerContent, document.body) : null;
 }

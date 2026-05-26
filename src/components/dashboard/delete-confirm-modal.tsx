@@ -1,7 +1,6 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Loader2, AlertTriangle } from "lucide-react";
+import { createPortal } from "react-dom";
 
 import { Property } from "@/types/property";
 
@@ -15,6 +14,11 @@ interface DeleteModalProps {
 export default function DeleteConfirmModal({ property, isOpen, onClose, onConfirm }: DeleteModalProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   if (!property || !isOpen) return null;
 
@@ -31,13 +35,13 @@ export default function DeleteConfirmModal({ property, isOpen, onClose, onConfir
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  const modalContent = (
+    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/75 backdrop-blur-sm animate-fade-in" onClick={onClose}></div>
 
       {/* Modal Card */}
-      <div className="relative bg-[#161616] border border-zinc-900 w-full max-w-md shadow-2xl z-10 text-zinc-300 rounded-none overflow-hidden">
+      <div className="relative bg-[#161616] border border-zinc-900 w-full max-w-md shadow-2xl z-[1000] text-zinc-300 rounded-none overflow-hidden">
         
         {/* Header */}
         <div className="p-4 border-b border-zinc-900 flex items-center justify-between bg-[#1F1F1F]">
@@ -93,4 +97,6 @@ export default function DeleteConfirmModal({ property, isOpen, onClose, onConfir
       </div>
     </div>
   );
+
+  return mounted ? createPortal(modalContent, document.body) : null;
 }
