@@ -92,8 +92,8 @@ export default function PropertyTable({ properties, pagination, onRowClick, high
   return (
     <div className="bg-[#161616] border border-zinc-900 flex flex-col justify-between overflow-hidden shadow-2xl relative">
       {/* Table responsive viewport */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
+      <div className="overflow-x-auto dashboard-scroll">
+        <table className="w-full min-w-[1200px] text-left border-collapse">
           <thead>
             <tr className="border-b border-zinc-900 bg-[#1F1F1F] text-[10px] uppercase font-bold text-zinc-400 tracking-wider select-none">
               <th onClick={() => handleSort("nama")} className="px-6 py-4 cursor-pointer hover:bg-[#252525] hover:text-white transition-colors">
