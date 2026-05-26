@@ -50,7 +50,7 @@ export default function WhyChooseUs() {
   };
 
   return (
-    <section className="py-28 bg-[#F5F5F5] px-4 sm:px-6 lg:px-8 border-t border-zinc-200 relative overflow-hidden">
+    <section className="py-28 bg-[#F5F5F5] bg-lux-grid px-4 sm:px-6 lg:px-8 border-t border-zinc-200 relative overflow-hidden">
       
       {/* Decorative luxury lines */}
       <div className="absolute top-0 left-1/4 w-[1px] h-full bg-zinc-200/50 pointer-events-none hidden lg:block"></div>
@@ -89,7 +89,7 @@ export default function WhyChooseUs() {
               <motion.div
                 key={idx}
                 variants={itemVariants}
-                className="bg-white border border-zinc-200 p-8 sm:p-10 flex flex-col justify-between hover:border-[#C9A961]/40 transition-all duration-500 rounded-none group h-full glow-gold-hover"
+                className="bg-white border border-zinc-200 p-8 sm:p-10 flex flex-col justify-between hover:border-[#C9A961]/40 transition-all duration-500 rounded-none group h-full glow-gold-hover shimmer-sweep"
               >
                 <div className="space-y-6">
                   {/* Icon Block with Thin Accent Border */}

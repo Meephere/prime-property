@@ -92,7 +92,7 @@ export default function FeaturedProperties({ properties }: { properties: Propert
   };
 
   return (
-    <section id="featured-properties" className="py-28 bg-white px-4 sm:px-6 lg:px-8 relative overflow-hidden border-b border-zinc-200">
+    <section id="featured-properties" className="py-28 bg-white bg-lux-grid px-4 sm:px-6 lg:px-8 relative overflow-hidden border-b border-zinc-200">
       
       {/* Decorative architectural background lines */}
       <div className="absolute inset-y-0 left-10 w-[1px] bg-zinc-100 pointer-events-none hidden xl:block"></div>
@@ -138,7 +138,7 @@ export default function FeaturedProperties({ properties }: { properties: Propert
                   key={property.id}
                   variants={cardVariants}
                   onClick={() => handleViewDetails(property)}
-                  className="bg-white border border-zinc-200 hover:border-[#C9A961]/40 transition-all duration-500 flex flex-col group relative overflow-hidden rounded-none h-full glow-gold-hover cursor-pointer"
+                  className="bg-white border border-zinc-200 hover:border-[#C9A961]/40 transition-all duration-500 flex flex-col group relative overflow-hidden rounded-none h-full glow-gold-hover cursor-pointer shimmer-sweep"
                 >
                   {/* Subtle top indicator line on hover */}
                   <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#C9A961] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left z-20"></div>
