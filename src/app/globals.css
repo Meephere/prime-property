@@ -1,0 +1,219 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FFFFFF;
+  --foreground: #1A1A1A;
+  
+  --primary: #C9A961;
+  --primary-foreground: #FFFFFF;
+  
+  --card: #F5F5F5;
+  --card-foreground: #1A1A1A;
+  
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A1A;
+  
+  --secondary: #F5F5F5;
+  --secondary-foreground: #1A1A1A;
+  
+  --muted: #F5F5F5;
+  --muted-foreground: #737373;
+  
+  --accent: #C9A961;
+  --accent-foreground: #FFFFFF;
+  
+  --destructive: #B33A3A;
+  --destructive-foreground: #FFFFFF;
+  
+  --border: #E5E5E5;
+  --input: #F5F5F5;
+  --ring: #C9A961;
+  
+  --radius: 0px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  --color-gold: #C9A961;
+  --color-brand-red: #B33A3A;
+  --color-brand-black: #1A1A1A;
+  --color-soft-gray: #F5F5F5;
+  
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  
+  --font-sans: var(--font-geist-sans), sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+}
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F5F5F5;
+}
+::-webkit-scrollbar-thumb {
+  background: #D4D4D4;
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C9A961;
+}
+
+/* Shimmer animations */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Elegant Premium Background Patterns */
+.bg-lux-grid {
+  background-image: 
+    radial-gradient(circle at 1.5px 1.5px, rgba(201, 169, 97, 0.05) 1.5px, transparent 0),
+    linear-gradient(to right, rgba(0, 0, 0, 0.012) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.012) 1px, transparent 1px);
+  background-size: 32px 32px, 160px 160px, 160px 160px;
+}
+
+.bg-lux-grid-dark {
+  background-image: 
+    radial-gradient(circle at 1.5px 1.5px, rgba(201, 169, 97, 0.08) 1.5px, transparent 0),
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px, 160px 160px, 160px 160px;
+}
+
+/* Floating animation for decorative background circles */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(20px, -30px) scale(1.1);
+  }
+}
+
+@keyframes float-slow-reverse {
+  0%, 100% {
+    transform: translate(0, 0) scale(1.1);
+  }
+  50% {
+    transform: translate(-30px, 20px) scale(0.95);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 20s ease-in-out infinite;
+}
+
+.animate-float-slow-reverse {
+  animation: float-slow-reverse 25s ease-in-out infinite;
+}
+
+/* Glassmorphism Styles */
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.glass-panel-dark {
+  background: rgba(26, 26, 26, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Glowing Aksen Gold & Red */
+.glow-gold {
+  box-shadow: 0 0 20px rgba(201, 169, 97, 0.12);
+}
+
+.glow-gold-hover:hover {
+  box-shadow: 0 0 25px rgba(201, 169, 97, 0.22);
+}
+
+.glow-red {
+  box-shadow: 0 0 20px rgba(179, 58, 58, 0.12);
+}
+
+.glow-red-hover:hover {
+  box-shadow: 0 0 25px rgba(179, 58, 58, 0.22);
+}
+
+/* Animated Shimmer Sweep Effect */
+.shimmer-sweep {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer-sweep::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 169, 97, 0.08),
+    transparent
+  );
+  transform: skewX(-25deg);
+  transition: 0.75s;
+}
+.shimmer-sweep:hover::after {
+  left: 150%;
+}
+
+/* Dashboard Scrollbars */
+.dashboard-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.dashboard-scroll::-webkit-scrollbar-track {
+  background: #111111;
+}
+.dashboard-scroll::-webkit-scrollbar-thumb {
+  background: #2A2A2A;
+  border-radius: 0px;
+}
+.dashboard-scroll::-webkit-scrollbar-thumb:hover {
+  background: #C9A961;
+}
+
+

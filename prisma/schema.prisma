@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  SUPERADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum TipeProperty {
+  Ruko
+  Villa
+}
+
+enum StatusProperty {
+  in_stock
+  sold_out
+}
+
+enum SiapProperty {
+  siap_huni
+  siap_kosong
+  siap_huni_renovasi
+}
+
+model User {
+  id                    String      @id @default(uuid())
+  email                 String      @unique
+  password              String
+  nama                  String
+  role                  Role        @default(ADMIN)
+  status                UserStatus  @default(ACTIVE)
+  failed_login_attempts Int         @default(0)
+  lockout_until         DateTime?
+  created_at            DateTime    @default(now())
+  updated_at            DateTime    @updatedAt
+  properties            Property[]
+  audit_logs            AuditLog[]
+}
+
+model Property {
+  id              String         @id @default(uuid())
+  nama_property   String
+  group           String?
+  lebar           Decimal        @db.Decimal(10, 2)
+  panjang         Decimal        @db.Decimal(10, 2)
+  hadap           String[]       // Utara, Selatan, Timur, Barat
+  tipe            TipeProperty
+  tingkat         Decimal        @db.Decimal(3, 1)
+  price           BigInt         // Disimpan sebagai integer rupiah
+  carport         Boolean
+  status          StatusProperty
+  siap            SiapProperty
+  maps_link       String?
+  kawasan         String[]       // e.g. ["Krakatau", "Pancing"]
+  unit            String?
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+  created_by      String
+  created_by_user User           @relation(fields: [created_by], references: [id])
+  deleted_at      DateTime?      // Soft delete
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  action     String   // e.g., "CREATE_PROPERTY", "UPDATE_PROPERTY", "DELETE_PROPERTY"
+  details    Json     // detail perubahan
+  created_at DateTime @default(now())
+}
+
+model ContactSubmission {
+  id         String   @id @default(uuid())
+  nama       String
+  email      String
+  nomor_hp   String
+  pesan      String
+  ip_address String
+  created_at DateTime @default(now())
+}
+
