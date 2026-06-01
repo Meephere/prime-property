@@ -28,40 +28,49 @@ const isProtectedRoute = createRouteMatcher([
   "/agent/dashboard(.*)",
 ]);
 
-// Clerk middleware instance
-const clerk = clerkMiddleware(async (auth, req) => {
-  if (isProtectedRoute(req)) {
-    // Try to protect using Clerk first
-    try {
-      await auth.protect();
-    } catch (clerkError) {
-      // If Clerk protection fails, fall back to check the legacy custom JWT token in cookies
-      const token = req.cookies.get(COOKIE_NAME)?.value;
-      if (token) {
-        const payload = decodeToken(token);
-        const nowInSeconds = Math.floor(Date.now() / 1000);
-        if (payload && payload.exp > nowInSeconds) {
-          // Legacy token is valid, allow the request to proceed and pass headers
-          const requestHeaders = new Headers(req.headers);
-          requestHeaders.set("x-agent-id", payload.id);
-          requestHeaders.set("x-agent-email", payload.email);
-          requestHeaders.set("x-agent-nama", payload.nama);
-          requestHeaders.set("x-agent-role", payload.role);
+// Clerk middleware instance (fail-safe wrapper)
+let clerk: any = null;
+const hasClerkKeys = !!(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && process.env.CLERK_SECRET_KEY);
+
+if (hasClerkKeys) {
+  try {
+    clerk = clerkMiddleware(async (auth, req) => {
+      if (isProtectedRoute(req)) {
+        // Try to protect using Clerk first
+        try {
+          await auth.protect();
+        } catch (clerkError) {
+          // If Clerk protection fails, fall back to check the legacy custom JWT token in cookies
+          const token = req.cookies.get(COOKIE_NAME)?.value;
+          if (token) {
+            const payload = decodeToken(token);
+            const nowInSeconds = Math.floor(Date.now() / 1000);
+            if (payload && payload.exp > nowInSeconds) {
+              // Legacy token is valid, allow the request to proceed and pass headers
+              const requestHeaders = new Headers(req.headers);
+              requestHeaders.set("x-agent-id", payload.id);
+              requestHeaders.set("x-agent-email", payload.email);
+              requestHeaders.set("x-agent-nama", payload.nama);
+              requestHeaders.set("x-agent-role", payload.role);
+              
+              return NextResponse.next({
+                request: {
+                  headers: requestHeaders,
+                },
+              });
+            }
+          }
           
-          return NextResponse.next({
-            request: {
-              headers: requestHeaders,
-            },
-          });
+          // If both fail, redirect to login
+          const url = new URL("/agent/login", req.url);
+          return NextResponse.redirect(url);
         }
       }
-      
-      // If both fail, redirect to login
-      const url = new URL("/agent/login", req.url);
-      return NextResponse.redirect(url);
-    }
+    });
+  } catch (error) {
+    console.warn("Gagal menginisialisasi Clerk Middleware (kunci mungkin belum terpasang):", error);
   }
-});
+}
 
 export function proxy(request: NextRequest, event: any) {
   const { pathname } = request.nextUrl;
@@ -94,8 +103,17 @@ export function proxy(request: NextRequest, event: any) {
     }
   }
 
-  // 3. Delegate to Clerk middleware
-  return clerk(request, event);
+  // 3. Delegate to Clerk middleware if available
+  if (clerk && hasClerkKeys) {
+    try {
+      return clerk(request, event);
+    } catch (err) {
+      console.error("Kesalahan eksekusi Clerk middleware:", err);
+      return NextResponse.next();
+    }
+  }
+
+  return NextResponse.next();
 }
 
 // Config to specify which paths proxy should run on
