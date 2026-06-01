@@ -22,11 +22,12 @@ const createPropertySchema = z.object({
   }, "URL harus valid berisi domain google.com/maps"),
   kawasan: z.array(z.string()).min(1, "Kawasan minimal pilih 1"),
   unit: z.string().nullable().optional(),
+  images: z.array(z.string()).optional(),
 });
 
 export async function GET(req: NextRequest) {
   try {
-    const user = getUserFromRequest(req);
+    const user = await getUserFromRequest(req);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized", message: "Silakan login terlebih dahulu." }, { status: 401 });
     }
@@ -223,6 +224,7 @@ export async function GET(req: NextRequest) {
       maps_link: p.maps_link,
       kawasan: p.kawasan,
       unit: p.unit,
+      images: p.images || [],
       created_at: p.created_at || new Date(),
     }));
 
@@ -245,7 +247,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     // 1. Verify Authentication & Authorization
-    const user = getUserFromRequest(req);
+    const user = await getUserFromRequest(req);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized", message: "Silakan login terlebih dahulu." }, { status: 401 });
     }
@@ -291,6 +293,7 @@ export async function POST(req: NextRequest) {
             maps_link: data.maps_link || null,
             kawasan: data.kawasan,
             unit: data.unit || null,
+            images: data.images || [],
             created_by: user.id,
           },
         });
@@ -320,6 +323,7 @@ export async function POST(req: NextRequest) {
         id: `mock-created-${Date.now()}`,
         ...data,
         price: BigInt(data.price),
+        images: data.images || [],
         created_at: new Date(),
       };
     }

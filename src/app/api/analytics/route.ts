@@ -5,7 +5,7 @@ import { getUserFromRequest } from "@/lib/auth";
 export async function GET(req: NextRequest) {
   try {
     // 1. Verify Authentication & Authorization (Superadmin Only)
-    const user = getUserFromRequest(req);
+    const user = await getUserFromRequest(req);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized", message: "Silakan login terlebih dahulu." }, { status: 401 });
     }

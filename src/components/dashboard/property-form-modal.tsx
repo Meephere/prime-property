@@ -38,6 +38,7 @@ const propertyFormSchema = z.object({
   }, "URL harus valid berisi domain google.com/maps"),
   kawasan: z.array(z.string()).min(1, "Pilih minimal 1 kawasan"),
   unit: z.string().nullable().optional(),
+  images: z.array(z.string()).optional(),
 });
 
 type FormValues = z.infer<typeof propertyFormSchema>;
@@ -47,6 +48,7 @@ export default function PropertyFormModal({ property, isOpen, onClose, onSuccess
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   
   // Custom tag states for kawasan
   const [customKawasan, setCustomKawasan] = useState("");
@@ -81,11 +83,13 @@ export default function PropertyFormModal({ property, isOpen, onClose, onSuccess
       maps_link: "",
       kawasan: [],
       unit: "",
+      images: [],
     },
   });
 
   const watchedHadap = watch("hadap") || [];
   const watchedKawasan = watch("kawasan") || [];
+  const watchedImages = watch("images") || [];
 
   // Prefill form when editing
   useEffect(() => {
@@ -114,6 +118,7 @@ export default function PropertyFormModal({ property, isOpen, onClose, onSuccess
           maps_link: property.maps_link || "",
           kawasan: property.kawasan,
           unit: property.unit || "",
+          images: property.images || [],
         });
       } else {
         setAvailableKawasan(KAWASAN_OPTIONS);
@@ -132,6 +137,7 @@ export default function PropertyFormModal({ property, isOpen, onClose, onSuccess
           maps_link: "",
           kawasan: [],
           unit: "",
+          images: [],
         });
       }
     }
@@ -166,6 +172,45 @@ export default function PropertyFormModal({ property, isOpen, onClose, onSuccess
       setValue("kawasan", [...watchedKawasan, tag], { shouldDirty: true });
     }
     setCustomKawasan("");
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    setUploadingImage(true);
+    setSubmitError(null);
+    
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append("file", file);
+        
+        const res = await fetch("/api/properti/upload", {
+          method: "POST",
+          body: formData,
+        });
+        
+        const result = await res.json();
+        if (res.ok) {
+          const currentImages = watch("images") || [];
+          setValue("images", [...currentImages, result.url], { shouldDirty: true });
+        } else {
+          setSubmitError(result.message || "Gagal mengunggah foto.");
+        }
+      }
+    } catch (err) {
+      setSubmitError("Terjadi kesalahan jaringan saat mengunggah.");
+    } finally {
+      setUploadingImage(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleRemoveImage = (imgUrl: string) => {
+    const currentImages = watch("images") || [];
+    setValue("images", currentImages.filter(url => url !== imgUrl), { shouldDirty: true });
   };
 
   const handleFormSubmit = async (values: FormValues, submitAndAddMore = false) => {
@@ -204,6 +249,7 @@ export default function PropertyFormModal({ property, isOpen, onClose, onSuccess
             maps_link: "",
             kawasan: [],
             unit: "",
+            images: [],
           });
         } else {
           onClose();
@@ -549,6 +595,59 @@ export default function PropertyFormModal({ property, isOpen, onClose, onSuccess
                   {errors.maps_link.message}
                 </p>
               )}
+            </div>
+
+            {/* Foto Properti */}
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-xs uppercase tracking-wider text-zinc-400 font-semibold flex items-center justify-between">
+                <span>Foto Properti (Maksimal 5 Foto)</span>
+                {uploadingImage && (
+                  <span className="flex items-center text-[10px] text-[#C9A961] uppercase tracking-wider font-medium animate-pulse">
+                    <Loader2 className="h-3 w-3 mr-1 animate-spin" /> Mengunggah...
+                  </span>
+                )}
+              </label>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                {/* Preview Gambar */}
+                {watchedImages.map((url, index) => (
+                  <div key={url} className="relative aspect-video sm:aspect-square bg-zinc-900 border border-zinc-800 group overflow-hidden">
+                    <img
+                      src={url}
+                      alt={`Foto Properti ${index + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(url)}
+                      className="absolute top-1.5 right-1.5 p-1 bg-black/70 hover:bg-red-950 border border-zinc-850 text-white rounded-none cursor-pointer transition-colors duration-150"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/60 py-0.5 text-center text-[9px] text-zinc-400 font-medium border-t border-zinc-900">
+                      Foto {index + 1}
+                    </div>
+                  </div>
+                ))}
+
+                {/* Dropzone Upload Button */}
+                {watchedImages.length < 5 && (
+                  <label className="relative aspect-video sm:aspect-square bg-[#111111] hover:bg-[#1a1a1a] border border-dashed border-zinc-800 hover:border-[#C9A961]/50 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploadingImage}
+                    />
+                    <PlusCircle className="h-5 w-5 text-zinc-500 group-hover:text-[#C9A961] mb-1.5 transition-colors duration-300" />
+                    <span className="text-[10px] uppercase tracking-wider text-zinc-500 group-hover:text-zinc-300 font-semibold transition-colors duration-300">
+                      Unggah Foto
+                    </span>
+                  </label>
+                )}
+              </div>
             </div>
 
           </div>

@@ -23,6 +23,7 @@ interface PropertyItem {
   siap: string;
   kawasan: string[];
   unit: string | null;
+  images?: string[];
 }
 
 export default function FeaturedProperties({ properties }: { properties: PropertyItem[] }) {
@@ -138,11 +139,36 @@ export default function FeaturedProperties({ properties }: { properties: Propert
                   key={property.id}
                   variants={cardVariants}
                   onClick={() => handleViewDetails(property)}
-                  className="bg-white border border-zinc-200 hover:border-[#C9A961]/40 transition-all duration-500 flex flex-col group relative overflow-hidden rounded-none h-full glow-gold-hover cursor-pointer shimmer-sweep"
+                  className="bg-white border border-zinc-200 hover:border-[#C9A961]/40 transition-all duration-500 flex flex-col group relative overflow-hidden rounded-none h-full glow-gold-hover cursor-pointer shimmer-sweep antigravity-card"
                 >
                   {/* Subtle top indicator line on hover */}
                   <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#C9A961] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left z-20"></div>
                   
+                  {/* Property Image Cover */}
+                  <div className="relative h-[180px] w-full bg-zinc-900 overflow-hidden border-b border-zinc-800">
+                    {property.images && property.images.length > 0 ? (
+                      <img
+                        src={property.images[0]}
+                        alt={property.nama_property}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex flex-col items-center justify-center relative p-6">
+                        <div className="absolute inset-0 bg-lux-grid opacity-15"></div>
+                        <Landmark className="h-8 w-8 text-[#C9A961]/40 mb-2" />
+                        <span className="text-[9px] tracking-[0.25em] uppercase font-bold text-[#C9A961]/50">
+                          PRIME PROPERTY
+                        </span>
+                      </div>
+                    )}
+                    {/* Floating badge for Property Tipe */}
+                    <div className="absolute bottom-3 left-3 bg-[#1A1A1A]/85 backdrop-blur-sm px-2.5 py-1 border border-zinc-800">
+                      <span className="text-[9px] tracking-[0.2em] uppercase font-bold text-[#C9A961]">
+                        {property.tipe}
+                      </span>
+                    </div>
+                  </div>
+
                   {/* Black Card Header */}
                   <div className="bg-[#1A1A1A] p-6 relative border-b border-zinc-800/50 flex flex-col justify-between h-[130px]">
                     <span className="text-[10px] tracking-[0.2em] uppercase font-bold text-[#C9A961]">

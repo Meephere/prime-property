@@ -43,17 +43,19 @@ export default function PropertyDetailDrawer({
   const [dpPercent, setDpPercent] = useState<number>(20);
   const [tenor, setTenor] = useState<number>(15); // years
   const [interestRate, setInterestRate] = useState<number>(6.5); // % annual
+  const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Reset calculator when property changes
+  // Reset calculator and gallery when property changes
   useEffect(() => {
     if (property) {
       setDpPercent(20);
       setTenor(15);
       setInterestRate(6.5);
+      setActiveImageIndex(0);
     }
   }, [property]);
 
@@ -138,6 +140,44 @@ export default function PropertyDetailDrawer({
 
             {/* Content Body */}
             <div className="p-6 flex-grow space-y-8 text-xs sm:text-sm text-zinc-400">
+              {/* Gambar Properti Gallery */}
+              {property.images && property.images.length > 0 && (
+                <div className="space-y-2">
+                  <div className="relative aspect-video w-full bg-zinc-950 border border-zinc-900 overflow-hidden">
+                    <img
+                      src={property.images[activeImageIndex]}
+                      alt={`${property.nama_property} ${activeImageIndex + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute bottom-2.5 right-2.5 bg-black/70 backdrop-blur-sm px-2 py-0.5 text-[10px] text-zinc-400 border border-zinc-800">
+                      {activeImageIndex + 1} / {property.images.length}
+                    </div>
+                  </div>
+                  
+                  {property.images.length > 1 && (
+                    <div className="flex gap-2 overflow-x-auto pb-1 dashboard-scroll">
+                      {property.images.map((url, index) => (
+                        <button
+                          key={url}
+                          type="button"
+                          onClick={() => setActiveImageIndex(index)}
+                          className={`relative h-12 w-20 flex-shrink-0 bg-zinc-950 border transition-all duration-150 cursor-pointer overflow-hidden ${
+                            index === activeImageIndex
+                              ? "border-[#C9A961] opacity-100"
+                              : "border-zinc-900 opacity-60 hover:opacity-100"
+                          }`}
+                        >
+                          <img
+                            src={url}
+                            alt={`Thumbnail ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
               {/* Main Badge Area */}
               <div className="flex flex-wrap items-center gap-2">
                 <span className="px-2.5 py-1 text-xs tracking-wider uppercase font-bold bg-[#C9A961]/10 border border-[#C9A961]/40 text-[#C9A961] shadow-[0_0_8px_rgba(201,169,97,0.12)]">

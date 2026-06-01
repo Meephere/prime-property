@@ -64,6 +64,7 @@ model Property {
   maps_link       String?
   kawasan         String[]       // e.g. ["Krakatau", "Pancing"]
   unit            String?
+  images          String[]       @default([])
   created_at      DateTime       @default(now())
   updated_at      DateTime       @updatedAt
   created_by      String

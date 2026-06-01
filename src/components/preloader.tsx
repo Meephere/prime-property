@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Landmark } from "lucide-react";
+
 
 interface PreloaderProps {
   onComplete: () => void;
@@ -98,9 +98,9 @@ export default function Preloader({ onComplete }: PreloaderProps) {
               scale: [0.5, 1, 1.05],
               transition: { duration: 1.5, ease: [0.16, 1, 0.3, 1] as const } 
             }}
-            className="p-5 rounded-full bg-[#1A1A1A] border border-[#C9A961]/10 shadow-xl relative z-10 flex items-center justify-center"
+            className="p-4 rounded-full bg-[#1A1A1A] border border-[#C9A961]/10 shadow-xl relative z-10 flex items-center justify-center"
           >
-            <Landmark className="h-10 w-10 sm:h-12 sm:w-12 text-[#C9A961]" />
+            <img src="/logo.png" alt="Prime Property Logo" className="h-12 w-auto sm:h-14" />
           </motion.div>
         </div>
 

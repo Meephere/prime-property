@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/rate-limiter";
 
 const COOKIE_NAME = "auth_token";
@@ -24,7 +24,46 @@ function decodeToken(token: string): DecodedToken | null {
   }
 }
 
-export function proxy(request: NextRequest) {
+const isProtectedRoute = createRouteMatcher([
+  "/agent/dashboard(.*)",
+]);
+
+// Clerk middleware instance
+const clerk = clerkMiddleware(async (auth, req) => {
+  if (isProtectedRoute(req)) {
+    // Try to protect using Clerk first
+    try {
+      await auth.protect();
+    } catch (clerkError) {
+      // If Clerk protection fails, fall back to check the legacy custom JWT token in cookies
+      const token = req.cookies.get(COOKIE_NAME)?.value;
+      if (token) {
+        const payload = decodeToken(token);
+        const nowInSeconds = Math.floor(Date.now() / 1000);
+        if (payload && payload.exp > nowInSeconds) {
+          // Legacy token is valid, allow the request to proceed and pass headers
+          const requestHeaders = new Headers(req.headers);
+          requestHeaders.set("x-agent-id", payload.id);
+          requestHeaders.set("x-agent-email", payload.email);
+          requestHeaders.set("x-agent-nama", payload.nama);
+          requestHeaders.set("x-agent-role", payload.role);
+          
+          return NextResponse.next({
+            request: {
+              headers: requestHeaders,
+            },
+          });
+        }
+      }
+      
+      // If both fail, redirect to login
+      const url = new URL("/agent/login", req.url);
+      return NextResponse.redirect(url);
+    }
+  }
+});
+
+export function proxy(request: NextRequest, event: any) {
   const { pathname } = request.nextUrl;
 
   // 1. Global API Rate Limiting (100 req/minute/IP)
@@ -43,49 +82,7 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // 2. Protect internal agent routes
-  if (pathname.startsWith("/agent/dashboard")) {
-    const token = request.cookies.get(COOKIE_NAME)?.value;
-
-    if (!token) {
-      // Redirect to login if token is missing
-      const url = new URL("/agent/login", request.url);
-      return NextResponse.redirect(url);
-    }
-
-    const payload = decodeToken(token);
-
-    if (!payload) {
-      // Redirect to login if token is invalid
-      const response = NextResponse.redirect(new URL("/agent/login", request.url));
-      response.cookies.delete(COOKIE_NAME);
-      return response;
-    }
-
-    // Check expiration (exp is in seconds)
-    const nowInSeconds = Math.floor(Date.now() / 1000);
-    if (payload.exp < nowInSeconds) {
-      // Redirect to login if token expired
-      const response = NextResponse.redirect(new URL("/agent/login", request.url));
-      response.cookies.delete(COOKIE_NAME);
-      return response;
-    }
-
-    // Pass role and email headers so downstream pages can know who is logged in
-    const requestHeaders = new Headers(request.headers);
-    requestHeaders.set("x-agent-id", payload.id);
-    requestHeaders.set("x-agent-email", payload.email);
-    requestHeaders.set("x-agent-role", payload.role);
-    requestHeaders.set("x-agent-nama", payload.nama);
-
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    });
-  }
-
-  // Redirect from /agent/login to /agent/dashboard if already logged in
+  // 2. Redirect from /agent/login to /agent/dashboard if already logged in (for legacy cookie)
   if (pathname === "/agent/login") {
     const token = request.cookies.get(COOKIE_NAME)?.value;
     if (token) {
@@ -97,10 +94,16 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  // 3. Delegate to Clerk middleware
+  return clerk(request, event);
 }
 
-// Config to specify which paths middleware should run on
+// Config to specify which paths proxy should run on
 export const config = {
-  matcher: ["/agent/dashboard/:path*", "/agent/login", "/api/:path*", "/__clerk/(.*)"],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Always run for API routes
+    "/(api|trpc)(.*)",
+  ],
 };

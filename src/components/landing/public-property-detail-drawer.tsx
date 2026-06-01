@@ -2,9 +2,10 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { formatRupiah, formatDimensions } from "@/lib/utils";
-import { X, MapPin, Compass, Layers, Landmark, Sparkles, Share2 } from "lucide-react";
+import { X, MapPin, Compass, Layers, Landmark, Sparkles, Share2, Box, Image as ImageIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import PropertyCustomizer3D from "./property-customizer-3d";
 
 // WhatsApp Icon
 const WhatsAppIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -34,6 +35,7 @@ interface PropertyItem {
   kawasan: string[];
   unit: string | null;
   maps_link?: string | null;
+  images?: string[];
 }
 
 interface DrawerProps {
@@ -49,17 +51,21 @@ export default function PublicPropertyDetailDrawer({ property, isOpen, onClose }
   const [dpPercent, setDpPercent] = useState<number>(20);
   const [tenor, setTenor] = useState<number>(15); // years
   const [interestRate, setInterestRate] = useState<number>(6.5); // % annual
+  const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
+  const [viewMode, setViewMode] = useState<"photo" | "3d">("photo");
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Reset calculator when property changes
+  // Reset calculator and gallery when property changes
   useEffect(() => {
     if (property) {
       setDpPercent(20);
       setTenor(15);
       setInterestRate(6.5);
+      setActiveImageIndex(0);
+      setViewMode("photo");
     }
   }, [property]);
 
@@ -165,6 +171,79 @@ ${propertyUrl}`;
 
             {/* Content Body */}
             <div className="p-6 flex-grow space-y-8 text-xs sm:text-sm text-zinc-600">
+              
+              {/* Toggle View Mode: Photo vs 3D */}
+              <div className="flex border border-zinc-200/80 mb-4 bg-zinc-50">
+                <button
+                  type="button"
+                  onClick={() => setViewMode("photo")}
+                  className={`flex-1 py-2.5 text-center text-[10px] font-bold uppercase tracking-wider flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+                    viewMode === "photo"
+                      ? "bg-[#C9A961] text-zinc-950"
+                      : "text-zinc-500 hover:text-zinc-800"
+                  }`}
+                >
+                  <ImageIcon className="h-3.5 w-3.5" />
+                  <span>Galeri Foto</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode("3d")}
+                  className={`flex-1 py-2.5 text-center text-[10px] font-bold uppercase tracking-wider flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
+                    viewMode === "3d"
+                      ? "bg-[#C9A961] text-zinc-950"
+                      : "text-zinc-500 hover:text-zinc-800"
+                  }`}
+                >
+                  <Box className="h-3.5 w-3.5" />
+                  <span>Kustomisasi 3D</span>
+                </button>
+              </div>
+
+              {/* Conditionally render view mode content */}
+              {viewMode === "photo" ? (
+                /* Gambar Properti Gallery */
+                property.images && property.images.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="relative aspect-video w-full bg-zinc-100 border border-zinc-200 overflow-hidden">
+                      <img
+                        src={property.images[activeImageIndex]}
+                        alt={`${property.nama_property} ${activeImageIndex + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute bottom-2.5 right-2.5 bg-black/75 px-2 py-0.5 text-[10px] text-zinc-350 border border-zinc-800">
+                        {activeImageIndex + 1} / {property.images.length}
+                      </div>
+                    </div>
+                    
+                    {property.images.length > 1 && (
+                      <div className="flex gap-2 overflow-x-auto pb-1 dashboard-scroll">
+                        {property.images.map((url, index) => (
+                          <button
+                            key={url}
+                            type="button"
+                            onClick={() => setActiveImageIndex(index)}
+                            className={`relative h-12 w-20 flex-shrink-0 bg-zinc-100 border transition-all duration-150 cursor-pointer overflow-hidden ${
+                              index === activeImageIndex
+                                ? "border-[#C9A961] opacity-100"
+                                : "border-zinc-200 opacity-60 hover:opacity-100"
+                            }`}
+                          >
+                            <img
+                              src={url}
+                              alt={`Thumbnail ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              ) : (
+                /* 3D Configurator */
+                <PropertyCustomizer3D tipe={property.tipe} nama={property.nama_property} />
+              )}
               
               {/* Main Badge Area */}
               <div className="flex flex-wrap items-center gap-2">

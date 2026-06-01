@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, Landmark, Shield, Bell } from "lucide-react";
+import { LogOut, Shield, Bell } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 interface HeaderProps {
@@ -93,7 +93,7 @@ export default function DashboardHeader({ user }: HeaderProps) {
     <header className="bg-[#111111]/80 backdrop-blur-md border-b border-zinc-900 h-16 flex items-center justify-between px-6 sticky top-0 z-40">
       {/* Brand logo for small screens (hidden on desktop sidebar) */}
       <div className="flex items-center space-x-2 md:hidden">
-        <Landmark className="h-6 w-6 text-[#C9A961]" />
+        <img src="/logo.png" alt="Prime Property Logo" className="h-6 w-auto" />
         <span className="font-sans font-bold text-sm tracking-wider text-white">
           PRIME <span className="text-[#C9A961]">PROPERTY</span>
         </span>

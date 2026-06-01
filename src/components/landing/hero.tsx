@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Landmark, ArrowRight, Compass, TrendingUp, ShieldCheck, DollarSign } from "lucide-react";
+import Hero3D from "./hero-3d";
 
 interface HeroProps {
   stats?: {
@@ -127,6 +128,11 @@ export default function Hero({ stats }: HeroProps) {
         {/* Right Column: Layered Asymmetrical Composition (Glass Panels) */}
         <div className="lg:col-span-5 relative h-[380px] sm:h-[450px] flex items-center justify-center lg:justify-end">
           
+          {/* Background 3D Canvas with depth */}
+          <div className="absolute inset-0 z-0 opacity-80 pointer-events-none select-none">
+            <Hero3D />
+          </div>
+
           {/* Main Floating Glass Panel */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 40 }}

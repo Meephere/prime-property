@@ -21,6 +21,7 @@ const updatePropertySchema = z.object({
   }, "URL harus valid berisi domain google.com/maps"),
   kawasan: z.array(z.string()).min(1, "Kawasan minimal pilih 1"),
   unit: z.string().nullable().optional(),
+  images: z.array(z.string()).optional(),
 });
 
 export async function GET(
@@ -28,7 +29,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = getUserFromRequest(req);
+    const user = await getUserFromRequest(req);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized", message: "Silakan login terlebih dahulu." }, { status: 401 });
     }
@@ -89,7 +90,7 @@ export async function PUT(
     const { id } = await params;
 
     // 1. Verify Authentication & Authorization
-    const user = getUserFromRequest(req);
+    const user = await getUserFromRequest(req);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized", message: "Silakan login terlebih dahulu." }, { status: 401 });
     }
@@ -140,7 +141,7 @@ export async function PUT(
       const changes: Record<string, { old: any; new: any }> = {};
       const fieldsToCheck: (keyof typeof data)[] = [
         "nama_property", "group", "lebar", "panjang", "hadap", "tipe", 
-        "tingkat", "price", "carport", "status", "siap", "maps_link", "kawasan", "unit"
+        "tingkat", "price", "carport", "status", "siap", "maps_link", "kawasan", "unit", "images"
       ];
 
       fieldsToCheck.forEach((field) => {
@@ -185,6 +186,7 @@ export async function PUT(
             maps_link: data.maps_link || null,
             kawasan: data.kawasan,
             unit: data.unit || null,
+            images: data.images || [],
           },
         });
 
@@ -222,6 +224,7 @@ export async function PUT(
         id,
         ...data,
         price: BigInt(data.price),
+        images: data.images || [],
         updated_at: new Date(),
       };
     }
@@ -249,7 +252,7 @@ export async function DELETE(
     const { id } = await params;
 
     // 1. Verify Authentication & Authorization
-    const user = getUserFromRequest(req);
+    const user = await getUserFromRequest(req);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized", message: "Silakan login terlebih dahulu." }, { status: 401 });
     }

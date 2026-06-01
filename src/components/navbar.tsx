@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Landmark } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Show, UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
@@ -23,6 +23,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "Beranda", href: "/" },
     { name: "Tentang Kami", href: "/tentang-kami" },
+    { name: "AI Consultant", href: "/ai-consultant" },
     { name: "Kontak", href: "/kontak" },
   ];
 
@@ -38,7 +39,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
-            <Landmark className="h-6 w-6 sm:h-8 sm:w-8 text-[#C9A961] transition-transform duration-300 group-hover:scale-105" />
+            <img src="/logo.png" alt="Prime Property Logo" className="h-8 w-auto sm:h-10 transition-transform duration-300 group-hover:scale-105" />
             <span className="font-sans font-bold text-lg sm:text-2xl tracking-wider text-white">
               PRIME <span className="text-[#C9A961]">PROPERTY</span>
             </span>

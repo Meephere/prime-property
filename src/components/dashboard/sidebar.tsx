@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Landmark, ListCollapse, History, LogOut, Users } from "lucide-react";
+import { ListCollapse, History, LogOut, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface SidebarProps {
@@ -56,7 +56,7 @@ export default function DashboardSidebar({ role }: SidebarProps) {
       {/* Brand Logo */}
       <div className="h-16 flex items-center px-6 border-b border-zinc-900">
         <Link href="/" className="flex items-center space-x-2">
-          <Landmark className="h-6 w-6 text-[#C9A961]" />
+          <img src="/logo.png" alt="Prime Property Logo" className="h-7 w-auto" />
           <span className="font-sans font-bold text-lg tracking-wider text-white">
             PRIME <span className="text-[#C9A961]">PROPERTY</span>
           </span>

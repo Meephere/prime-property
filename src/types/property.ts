@@ -14,5 +14,6 @@ export interface Property {
   kawasan: string[];
   unit: string | null;
   maps_link: string | null;
+  images?: string[];
   created_at: string;
 }

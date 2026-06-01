@@ -16,7 +16,7 @@ export async function PATCH(
     const { id } = await params;
 
     // 1. Verify Authentication & Authorization
-    const user = getUserFromRequest(req);
+    const user = await getUserFromRequest(req);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized", message: "Silakan login terlebih dahulu." }, { status: 401 });
     }

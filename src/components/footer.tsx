@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Landmark, Mail, Phone, ArrowUpRight } from "lucide-react";
+import { Mail, Phone, ArrowUpRight } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -11,7 +11,7 @@ export default function Footer() {
           {/* Brand Info */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center space-x-2">
-              <Landmark className="h-6 w-6 text-[#C9A961]" />
+              <img src="/logo.png" alt="Prime Property Logo" className="h-6 w-auto" />
               <span className="font-sans font-bold text-xl tracking-wider text-white">
                 PRIME <span className="text-[#C9A961]">PROPERTY</span>
               </span>

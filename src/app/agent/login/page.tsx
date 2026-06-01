@@ -6,7 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Landmark, Lock, Mail, Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { Lock, Mail, Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { useSignIn } from "@clerk/nextjs";
 
 import ElegantBackground from "@/components/elegant-bg";
 
@@ -19,6 +20,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function AgentLoginPage() {
   const router = useRouter();
+  const { signIn } = useSignIn();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -36,28 +38,42 @@ export default function AgentLoginPage() {
   });
 
   const onSubmit = async (data: LoginFormValues) => {
+    if (!signIn) return;
     setLoading(true);
     setErrorMessage(null);
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+      const { error } = await signIn.password({
+        identifier: data.email,
+        password: data.password,
       });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        // Successful login
-        router.push("/agent/dashboard");
-      } else {
-        // Handle error messages from backend
-        setErrorMessage(result.message || "Gagal masuk. Silakan periksa kembali email dan kata sandi Anda.");
+      if (error) {
+        setErrorMessage(error.longMessage || error.message || "Gagal masuk. Silakan periksa kembali email dan kata sandi Anda.");
+        return;
       }
-    } catch (err) {
-      setErrorMessage("Terjadi kesalahan koneksi. Silakan periksa jaringan internet Anda.");
+
+      if (signIn.status === "complete") {
+        await signIn.finalize({
+          navigate: ({ session, decorateUrl }) => {
+            const url = decorateUrl("/agent/dashboard");
+            if (url.startsWith("http")) {
+              window.location.href = url;
+            } else {
+              router.push(url);
+            }
+          },
+        });
+      } else {
+        setErrorMessage("Status login tidak dikenal: " + signIn.status);
+      }
+    } catch (err: any) {
+      console.error("Kesalahan Clerk Login:", err);
+      const firstError = err.errors?.[0];
+      setErrorMessage(
+        firstError?.longMessage ||
+        firstError?.message ||
+        "Gagal masuk. Silakan periksa kembali email dan kata sandi Anda."
+      );
     } finally {
       setLoading(false);
     }
@@ -76,8 +92,8 @@ export default function AgentLoginPage() {
       >
         {/* Logo and Headings */}
         <div className="text-center space-y-4">
-          <div className="inline-flex items-center justify-center p-3 rounded-full border border-[#C9A961]/20 bg-white shadow-sm">
-            <Landmark className="h-8 w-8 text-[#C9A961]" />
+          <div className="inline-flex items-center justify-center p-2 rounded-full border border-[#C9A961]/20 bg-white shadow-sm">
+            <img src="/logo.png" alt="Prime Property Logo" className="h-12 w-auto" />
           </div>
           <div className="space-y-1">
             <h2 className="text-xl font-bold tracking-wider text-[#1A1A1A] uppercase font-sans">
@@ -170,7 +186,7 @@ export default function AgentLoginPage() {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !signIn}
             className="w-full inline-flex items-center justify-center px-6 py-3.5 text-xs font-bold tracking-wider uppercase text-white bg-[#C9A961] hover:bg-[#E2C98A] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             {loading ? (

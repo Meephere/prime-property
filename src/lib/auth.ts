@@ -5,6 +5,9 @@ import { NextRequest } from "next/server";
 const JWT_SECRET = process.env.JWT_SECRET || "prime_property_secret_key_gold_luxury_2026";
 const COOKIE_NAME = "auth_token";
 
+import db from "@/lib/db";
+import { auth, currentUser } from "@clerk/nextjs/server";
+
 export interface JWTPayload {
   id: string;
   email: string;
@@ -46,10 +49,44 @@ export function getAuthToken(req: NextRequest): string | null {
   return null;
 }
 
-export function getUserFromRequest(req: NextRequest): JWTPayload | null {
+export async function getUserFromRequest(req: NextRequest): Promise<JWTPayload | null> {
+  // 1. Coba token JWT kustom lama terlebih dahulu (backward compatibility)
   const token = getAuthToken(req);
-  if (!token) return null;
-  return verifyToken(token);
+  if (token) {
+    const payload = verifyToken(token);
+    if (payload) return payload;
+  }
+
+  // 2. Coba autentikasi via Clerk
+  try {
+    const { userId } = await auth();
+    if (!userId) return null;
+
+    const clerkUser = await currentUser();
+    if (!clerkUser) return null;
+
+    const email = clerkUser.emailAddresses[0]?.emailAddress;
+    if (!email) return null;
+
+    // Cari user di database berdasarkan email
+    const dbUser = await db.user.findUnique({
+      where: { email },
+    });
+
+    if (!dbUser || dbUser.status !== "ACTIVE") {
+      return null;
+    }
+
+    return {
+      id: dbUser.id,
+      email: dbUser.email,
+      nama: dbUser.nama,
+      role: dbUser.role as "ADMIN" | "SUPERADMIN",
+    };
+  } catch (error) {
+    console.error("Kesalahan Clerk Auth di getUserFromRequest:", error);
+    return null;
+  }
 }
 
 export function setAuthCookie(token: string): string {
